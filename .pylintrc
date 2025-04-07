@@ -9,15 +9,11 @@ load-plugins=
 # Set the verbosity level of messages (0-5, where 5 is the maximum)
 msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'
 
-# Set the minimum score for passing the check (0-10)
-score-min=6
-
-# Enable or disable progress display
+# Enable or disable progress display (replaced score-min functionality)
 reports=no
 
-# Output format for reports (if reports=yes)
+# Output format for reports
 output-format=text
-reports-file=
 
 # Specify paths to be ignored by Pylint
 ignore=tests,venv,__pycache__
@@ -84,9 +80,7 @@ defining-attr-methods=__init__,__new__,setUp
 
 [IMPORTS]
 
-# Rules for imports
-# Allowable timeout for importing modules
-import-timeout=30
+# Rules for imports (import-timeout removed as unrecognized)
 
 [EXCEPTIONS]
 
