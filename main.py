@@ -1,5 +1,6 @@
-import train_and_save_model
-import test_model
+from test_model import test_model
+from train_model import train_and_save_model
+
 
 def main():
     print("start learning")

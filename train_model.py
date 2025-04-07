@@ -15,6 +15,7 @@ import os
 import torchvision.transforms as transforms
 from sklearn.metrics import classification_report, confusion_matrix
 
+
 def train_and_save_model():
     DATA_PATH = "./train"
     CLASSES = os.listdir(DATA_PATH)
@@ -48,7 +49,7 @@ def train_and_save_model():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    EPOCHS = 10
+    EPOCHS = 1
     train_losses, val_losses, train_acc, val_acc = [], [], [], []
 
     for epoch in range(EPOCHS):
@@ -89,7 +90,8 @@ def train_and_save_model():
         val_losses.append(running_loss / len(val_loader))
         val_acc.append(100 * correct / total)
 
-        print(f"Эпоха {epoch+1}/{EPOCHS}: Потери {train_losses[-1]:.4f}, Вал. потери {val_losses[-1]:.4f}, Точность {train_acc[-1]:.2f}%, Вал. точность {val_acc[-1]:.2f}%")
+        print(
+            f"Эпоха {epoch + 1}/{EPOCHS}: Потери {train_losses[-1]:.4f}, Вал. потери {val_losses[-1]:.4f}, Точность {train_acc[-1]:.2f}%, Вал. точность {val_acc[-1]:.2f}%")
 
     plt.figure(figsize=(12, 5))
     plt.subplot(1, 2, 1)
