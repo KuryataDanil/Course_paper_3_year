@@ -1,15 +1,16 @@
-import torch
-import torchvision.transforms as transforms
-from PIL import Image
-import os
-import pandas as pd
 import json
+import os
 
+import pandas as pd
+import torch
+from PIL import Image
 from torch.utils.data import Dataset
+from torchvision import transforms
+
 
 def test_model():
-    TEST_PATH = "./test"
-    test_images = [f for f in os.listdir(TEST_PATH) if f.endswith(('.png', '.jpg', '.jpeg'))]
+    test_path = "./test"
+    test_images = [f for f in os.listdir(test_path) if f.endswith(('.png', '.jpg', '.jpeg'))]
 
     test_transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -31,20 +32,20 @@ def test_model():
             image = self.transform(image)
             return image, os.path.basename(image_path)
 
-    test_image_paths = [os.path.join(TEST_PATH, img) for img in test_images]
+    test_image_paths = [os.path.join(test_path, img) for img in test_images]
     test_dataset = TestDataset(test_image_paths, test_transform)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False)
 
-    MODEL_PATH = "./model/resnet18_full_model.pt"
-    CLASSES_PATH = "./model/classes.json"
+    model_path = "./model/resnet18_full_model.pt"
+    classes_path = "./model/classes.json"
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = torch.load(MODEL_PATH)
+    model = torch.load(model_path)
     model = model.to(device)
     model.eval()
 
-    with open(CLASSES_PATH, "r") as f:
-        CLASSES = json.load(f)
+    with open(classes_path, "r", encoding='utf-8') as f:
+        classes = json.load(f)
 
     predictions = []
 
@@ -55,7 +56,7 @@ def test_model():
             _, preds = torch.max(outputs, 1)
             preds = preds.cpu().numpy()
             for filename, pred in zip(filenames, preds):
-                predictions.append((filename, CLASSES[pred]))
+                predictions.append((filename, classes[pred]))
 
     submission = pd.DataFrame(predictions, columns=["file", "species"])
     submission.to_csv("submission.csv", index=False)

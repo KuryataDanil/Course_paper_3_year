@@ -1,24 +1,18 @@
-import numpy as np
-import pandas as pd
+import os
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 import torch
-import torchvision
-from torchvision import datasets, models
-from torch.utils.data import DataLoader, Dataset
-import torch.nn as nn
-import torch.optim as optim
-from sklearn.model_selection import train_test_split
-from tqdm import tqdm
-from PIL import Image
-import os
-import torchvision.transforms as transforms
 from sklearn.metrics import classification_report, confusion_matrix
+from torch import nn, optim
+from torch.utils.data import DataLoader
+from torchvision import datasets, models, transforms
+from tqdm import tqdm
 
 
 def train_and_save_model():
-    DATA_PATH = "./train"
-    CLASSES = os.listdir(DATA_PATH)
+    data_path = "./train"
+    classes = os.listdir(data_path)
 
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -28,7 +22,7 @@ def train_and_save_model():
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    dataset = datasets.ImageFolder(root=DATA_PATH, transform=transform)
+    dataset = datasets.ImageFolder(root=data_path, transform=transform)
     train_size = int(0.8 * len(dataset))
     val_size = len(dataset) - train_size
 
@@ -42,17 +36,17 @@ def train_and_save_model():
 
     model = models.resnet18(pretrained=True)
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, len(CLASSES))
+    model.fc = nn.Linear(num_ftrs, len(classes))
 
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    EPOCHS = 1
+    epochs = 10
     train_losses, val_losses, train_acc, val_acc = [], [], [], []
 
-    for epoch in range(EPOCHS):
+    for epoch in range(epochs):
         model.train()
         running_loss, correct, total = 0.0, 0, 0
 
@@ -91,7 +85,7 @@ def train_and_save_model():
         val_acc.append(100 * correct / total)
 
         print(
-            f"Эпоха {epoch + 1}/{EPOCHS}: Потери {train_losses[-1]:.4f}, Вал. потери {val_losses[-1]:.4f}, Точность {train_acc[-1]:.2f}%, Вал. точность {val_acc[-1]:.2f}%")
+            f"Эпоха {epoch + 1}/{epochs}: Потери {train_losses[-1]:.4f}, Вал. потери {val_losses[-1]:.4f}, Точность {train_acc[-1]:.2f}%, Вал. точность {val_acc[-1]:.2f}%")
 
     plt.figure(figsize=(12, 5))
     plt.subplot(1, 2, 1)
@@ -108,8 +102,8 @@ def train_and_save_model():
 
     plt.show()
 
-    OUTPUT_DIR = "./output_images"
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    output_dir = "./output_images"
+    os.makedirs(output_dir, exist_ok=True)
 
     y_true, y_pred = [], []
 
@@ -123,19 +117,19 @@ def train_and_save_model():
             y_true.extend(labels.cpu().numpy())
             y_pred.extend(preds.cpu().numpy())
 
-    print(classification_report(y_true, y_pred, target_names=CLASSES))
+    print(classification_report(y_true, y_pred, target_names=classes))
 
     conf_matrix = confusion_matrix(y_true, y_pred)
 
     plt.figure(figsize=(10, 8))
-    sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=CLASSES, yticklabels=CLASSES)
+    sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=classes, yticklabels=classes)
     plt.xlabel("Предсказанный класс")
     plt.ylabel("Истинный класс")
     plt.title("Матрица ошибок")
 
-    plt.savefig(os.path.join(OUTPUT_DIR, "confusion_matrix.png"), dpi=300)
+    plt.savefig(os.path.join(output_dir, "confusion_matrix.png"), dpi=300)
     plt.show()
 
-    MODEL_DIR = "./model"
-    os.makedirs(MODEL_DIR, exist_ok=True)
-    torch.save(model, os.path.join(MODEL_DIR, "resnet18_full_model.pt"))
+    model_dir = "./model"
+    os.makedirs(model_dir, exist_ok=True)
+    torch.save(model, os.path.join(model_dir, "resnet18_full_model.pt"))
