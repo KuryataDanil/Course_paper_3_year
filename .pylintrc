@@ -1,0 +1,125 @@
+[MASTER]
+
+# Specify the minimum Python version compatible with your code
+py-version=3.10
+
+# Specify paths to additional modules or packages
+load-plugins=
+
+# Set the verbosity level of messages (0-5, where 5 is the maximum)
+msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}'
+
+# Set the minimum score for passing the check (0-10)
+score-min=6
+
+# Enable or disable progress display
+reports=no
+
+# Output format for reports (if reports=yes)
+output-format=text
+reports-file=
+
+# Specify paths to be ignored by Pylint
+ignore=tests,venv,__pycache__
+
+# Whitelist for extension packages
+extension-pkg-whitelist=pyd
+
+# Flags to control behavior
+persistent=yes
+jobs=1
+unsafe-load-any-extension=no
+
+[MESSAGES CONTROL]
+
+# Enable/disable checks by category or specific codes
+# Levels: C (conventions), R (refactoring), W (warnings), E (errors), F (fatal)
+# Example: Disable warnings about too long lines
+disable=
+    C0301,  # line-too-long
+    W1201,  # logging-not-lazy
+    R0903,  # too-few-public-methods
+    C0114,  # missing-module-docstring
+    C0115,  # missing-class-docstring
+    C0116   # missing-function-docstring
+
+# Enable only specific checks
+enable=
+    E,F
+
+# Threshold values for various metrics
+max-line-length=120
+max-module-lines=1000
+max-args=5
+max-locals=15
+max-returns=6
+max-branches=12
+max-statements=50
+max-parents=7
+max-attributes=7
+
+[DESIGN]
+
+# Rules for code structure checks
+max-public-methods=20
+min-public-methods=2
+
+[FORMAT]
+
+# Formatting rules
+expected-line-ending-format=LF
+indent-string='    '
+
+[VARIABLES]
+
+# Rules for variables
+init-import=no
+dummy-variables-rgx=^_|^unused_
+additional-builtins=
+
+[CLASSES]
+
+# Rules for classes
+defining-attr-methods=__init__,__new__,setUp
+
+[IMPORTS]
+
+# Rules for imports
+# Allowable timeout for importing modules
+import-timeout=30
+
+[EXCEPTIONS]
+
+# Rules for exception handling
+# Use fully qualified names for overgeneral exceptions
+overgeneral-exceptions=builtins.Exception
+
+[TYPECHECK]
+
+# Rules for type checking
+ignored-classes=optparse.Values,thread._local,_thread._local
+
+[SIMILARITIES]
+
+# Rules for detecting code duplication
+min-similarity-lines=4
+ignore-imports=yes
+ignore-signatures=no
+
+[LOGGING]
+
+# Rules for logging
+logging-modules=logging
+
+[BASIC]
+
+# Basic settings
+good-names=i,j,k,ex,Run,_
+
+# Additional naming conventions
+const-naming-style=UPPER_CASE
+variable-naming-style=snake_case
+method-naming-style=snake_case
+function-naming-style=snake_case
+class-naming-style=PascalCase
+inlinevar-naming-style=any
