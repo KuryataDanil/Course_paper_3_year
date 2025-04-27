@@ -106,7 +106,7 @@ def train_and_save_model():
 
     plt.show()
 
-    output_dir = "./output/output_images"
+    output_dir = "./output/output_images/"
     os.makedirs(output_dir, exist_ok=True)
 
     y_true, y_pred = [], []
