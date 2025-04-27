@@ -47,7 +47,7 @@ def train_and_save_model():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    epochs = 10
+    epochs = 1
     train_losses, val_losses, train_acc, val_acc = [], [], [], []
 
     for epoch in range(epochs):
@@ -106,7 +106,7 @@ def train_and_save_model():
 
     plt.show()
 
-    output_dir = "./output_images"
+    output_dir = "./output/output_images"
     os.makedirs(output_dir, exist_ok=True)
 
     y_true, y_pred = [], []
@@ -145,7 +145,3 @@ def train_and_save_model():
         json.dump(idx_to_class, f, ensure_ascii=False, indent=4)
 
     print(f"Модель и файл classes.json успешно сохранены в {model_dir}")
-
-
-if __name__ == "__main__":
-    train_and_save_model()

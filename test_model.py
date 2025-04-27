@@ -59,5 +59,5 @@ def test_model():
                 predictions.append((filename, classes[str(pred)]))
 
     submission = pd.DataFrame(predictions, columns=["file", "species"])
-    submission.to_csv("submission.csv", index=False)
+    submission.to_csv("./output/submission.csv", index=False)
     print("Файл submission.csv успешно создан.")
