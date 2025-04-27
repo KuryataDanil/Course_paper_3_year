@@ -7,7 +7,11 @@ from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
 
+from utils.decorators import execution_animation, execution_time
 
+
+@execution_time()
+@execution_animation()
 def test_model():
     test_path = "./test"
     test_images = [f for f in os.listdir(test_path) if f.endswith(('.png', '.jpg', '.jpeg'))]

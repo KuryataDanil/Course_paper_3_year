@@ -1,5 +1,5 @@
 import os
-import json  # Добавлен импорт json
+import json
 import matplotlib.pyplot as plt
 import seaborn as sns
 import torch
@@ -9,7 +9,10 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, models, transforms
 from tqdm import tqdm
 
+from utils.decorators import execution_time
 
+
+@execution_time()
 def train_and_save_model():
     data_path = "./train"
     classes = sorted(os.listdir(data_path))
@@ -47,14 +50,15 @@ def train_and_save_model():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-    epochs = 1
+    epochs = 10
     train_losses, val_losses, train_acc, val_acc = [], [], [], []
 
     for epoch in range(epochs):
         model.train()
         running_loss, correct, total = 0.0, 0, 0
 
-        for images, labels in tqdm(train_loader):
+        train_iterator = tqdm(train_loader, desc=f"Эпоха {epoch + 1}/{epochs}", leave=True)
+        for images, labels in train_iterator:
             images, labels = images.to(device), labels.to(device)
 
             optimizer.zero_grad()
@@ -67,6 +71,11 @@ def train_and_save_model():
             _, preds = torch.max(outputs, 1)
             correct += (preds == labels).sum().item()
             total += labels.size(0)
+
+            train_iterator.set_postfix({
+                'loss': running_loss / (train_iterator.n + 1),
+                'acc': 100 * correct / total
+            })
 
         train_losses.append(running_loss / len(train_loader))
         train_acc.append(100 * correct / total)
@@ -88,9 +97,9 @@ def train_and_save_model():
         val_losses.append(running_loss / len(val_loader))
         val_acc.append(100 * correct / total)
 
+        print("\r", end="")
         print(
             f"Эпоха {epoch + 1}/{epochs}: Потери {train_losses[-1]:.4f}, Вал. потери {val_losses[-1]:.4f}, Точность {train_acc[-1]:.2f}%, Вал. точность {val_acc[-1]:.2f}%")
-
     plt.figure(figsize=(12, 5))
     plt.subplot(1, 2, 1)
     plt.plot(train_losses, label="Train Loss")
