@@ -178,5 +178,5 @@ test/
 train/
 
 # Output
-output/.*
+output/.*/
 model/
