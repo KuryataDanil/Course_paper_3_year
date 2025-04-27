@@ -1,5 +1,5 @@
 import os
-
+import json  # Добавлен импорт json
 import matplotlib.pyplot as plt
 import seaborn as sns
 import torch
@@ -12,7 +12,10 @@ from tqdm import tqdm
 
 def train_and_save_model():
     data_path = "./train"
-    classes = os.listdir(data_path)
+    classes = sorted(os.listdir(data_path))
+
+    class_to_idx = {class_name: idx for idx, class_name in enumerate(classes)}
+    idx_to_class = {str(idx): class_name for idx, class_name in enumerate(classes)}
 
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -31,6 +34,7 @@ def train_and_save_model():
     val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
     print(f"Обучающих изображений: {len(train_dataset)}, валидационных: {len(val_dataset)}")
+    print(f"Классы: {classes}")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -132,4 +136,16 @@ def train_and_save_model():
 
     model_dir = "./model"
     os.makedirs(model_dir, exist_ok=True)
+
     torch.save(model, os.path.join(model_dir, "resnet18_full_model.pt"))
+
+    torch.save(model.state_dict(), os.path.join(model_dir, "resnet18_weights.pt"))
+
+    with open(os.path.join(model_dir, "classes.json"), 'w', encoding='utf-8') as f:
+        json.dump(idx_to_class, f, ensure_ascii=False, indent=4)
+
+    print(f"Модель и файл classes.json успешно сохранены в {model_dir}")
+
+
+if __name__ == "__main__":
+    train_and_save_model()

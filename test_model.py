@@ -40,7 +40,7 @@ def test_model():
     classes_path = "./model/classes.json"
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = torch.load(model_path)
+    model = torch.load(model_path, weights_only=False)
     model = model.to(device)
     model.eval()
 
@@ -56,7 +56,7 @@ def test_model():
             _, preds = torch.max(outputs, 1)
             preds = preds.cpu().numpy()
             for filename, pred in zip(filenames, preds):
-                predictions.append((filename, classes[pred]))
+                predictions.append((filename, classes[str(pred)]))
 
     submission = pd.DataFrame(predictions, columns=["file", "species"])
     submission.to_csv("submission.csv", index=False)
