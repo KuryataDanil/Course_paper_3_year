@@ -174,5 +174,6 @@ cython_debug/
 .pypirc
 
 # Datasets
-test/
-train/
+data/test/
+data/train/
+models/*/saved_model

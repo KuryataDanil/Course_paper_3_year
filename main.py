@@ -1,13 +1,12 @@
-from test_model import test_model
-from train_model import train_and_save_model
+import models.models as models
+import warnings
 
+warnings.filterwarnings("ignore")
 
 def main():
-    print("start learning")
-    train_and_save_model()
-    print("start testing")
-    test_model()
-
+    print("200 ok")
+    # sequentialAdvanced = models.SequentialAdvancedModel()
+    # sequentialAdvanced.train()
 
 if __name__ == "__main__":
     main()
