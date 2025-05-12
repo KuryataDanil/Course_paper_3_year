@@ -176,6 +176,3 @@ cython_debug/
 # Datasets
 data/test/
 data/train/
-
-# Output
-models/resnet/saved_model/
