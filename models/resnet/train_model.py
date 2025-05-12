@@ -9,12 +9,10 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, models, transforms
 from tqdm import tqdm
 
-from utils.decorators import execution_time
 
-
-@execution_time()
-def train_and_save_model():
-    data_path = "./train"
+def train_model():
+    package_dir = os.path.dirname(os.path.abspath(__file__))
+    data_path = os.path.join(package_dir, "../../data", "train")
     classes = sorted(os.listdir(data_path))
 
     class_to_idx = {class_name: idx for idx, class_name in enumerate(classes)}
@@ -115,7 +113,7 @@ def train_and_save_model():
 
     plt.show()
 
-    output_dir = "./output/output_images/"
+    output_dir = "./output/resnet/output_images/"
     os.makedirs(output_dir, exist_ok=True)
 
     y_true, y_pred = [], []
@@ -143,7 +141,8 @@ def train_and_save_model():
     plt.savefig(os.path.join(output_dir, "confusion_matrix.png"), dpi=300)
     plt.show()
 
-    model_dir = "./model"
+    package_dir = os.path.dirname(os.path.abspath(__file__))
+    model_dir = os.path.join(package_dir, "saved_model")
     os.makedirs(model_dir, exist_ok=True)
 
     torch.save(model, os.path.join(model_dir, "resnet18_full_model.pt"))

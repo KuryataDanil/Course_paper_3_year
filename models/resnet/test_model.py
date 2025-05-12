@@ -13,7 +13,7 @@ from utils.decorators import execution_animation, execution_time
 @execution_time()
 @execution_animation()
 def test_model():
-    test_path = "./test"
+    test_path = "./data/test"
     test_images = [f for f in os.listdir(test_path) if f.endswith(('.png', '.jpg', '.jpeg'))]
 
     test_transform = transforms.Compose([
@@ -40,8 +40,9 @@ def test_model():
     test_dataset = TestDataset(test_image_paths, test_transform)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False)
 
-    model_path = "./model/resnet18_full_model.pt"
-    classes_path = "./model/classes.json"
+    package_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(package_dir, "saved_model", "resnet18_full_model.pt")
+    classes_path = os.path.join(package_dir, "saved_model", "classes.json")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = torch.load(model_path, weights_only=False)
@@ -63,5 +64,5 @@ def test_model():
                 predictions.append((filename, classes[str(pred)]))
 
     submission = pd.DataFrame(predictions, columns=["file", "species"])
-    submission.to_csv("./output/submission.csv", index=False)
+    submission.to_csv("./output/resnet/submission.csv", index=False)
     print("Файл submission.csv успешно создан.")
