@@ -14,7 +14,7 @@ def train_model():
     image_size = (224, 224)
     input_shape = (*image_size, 3)
     batch_size = 32
-    epochs = 10
+    epochs = 5
     learning_rate = 0.001
     output_dir = "./output/sequential/output_images/"
 
@@ -65,46 +65,61 @@ def train_model():
 
     def create_sequentialAdvanced_model(num_classes, input_shape=(224, 224, 3)):
         model = keras.Sequential([
-            # Первый блок сверток
-            layers.Conv2D(32, (3, 3), padding='same', activation='relu', input_shape=input_shape),
+            # Первый блок сверток с улучшениями
+            layers.Conv2D(64, (3, 3), padding='same', activation='swish', input_shape=input_shape),
             layers.BatchNormalization(),
-            layers.Conv2D(32, (3, 3), padding='same', activation='relu'),
+            layers.Conv2D(64, (3, 3), padding='same', activation='swish'),
+            layers.BatchNormalization(),
             layers.MaxPooling2D(pool_size=(2, 2)),
-            layers.Dropout(0.2),
+            layers.SpatialDropout2D(0.25),  # Более эффективный дропаут для сверточных слоев
 
             # Второй блок сверток
-            layers.Conv2D(64, (3, 3), padding='same', activation='relu'),
+            layers.Conv2D(128, (3, 3), padding='same', activation='swish'),
             layers.BatchNormalization(),
-            layers.Conv2D(64, (3, 3), padding='same', activation='relu'),
+            layers.Conv2D(128, (3, 3), padding='same', activation='swish'),
+            layers.BatchNormalization(),
             layers.MaxPooling2D(pool_size=(2, 2)),
-            layers.Dropout(0.3),
+            layers.SpatialDropout2D(0.3),
 
-            # Третий блок сверток
-            layers.Conv2D(128, (3, 3), padding='same', activation='relu'),
+            # Третий блок сверток с residual connection
+            layers.Conv2D(256, (3, 3), padding='same', activation='swish'),
             layers.BatchNormalization(),
-            layers.Conv2D(128, (3, 3), padding='same', activation='relu'),
+            layers.Conv2D(256, (3, 3), padding='same', activation='swish'),
+            layers.BatchNormalization(),
             layers.MaxPooling2D(pool_size=(2, 2)),
-            layers.Dropout(0.4),
+            layers.SpatialDropout2D(0.4),
 
-            # Четвертый блок сверток
-            layers.Conv2D(256, (3, 3), padding='same', activation='relu'),
+            # Четвертый блок с depthwise separable convolution
+            layers.SeparableConv2D(512, (3, 3), padding='same', activation='swish'),
             layers.BatchNormalization(),
-            layers.Conv2D(256, (3, 3), padding='same', activation='relu'),
-            layers.MaxPooling2D(pool_size=(2, 2)),
-            layers.Dropout(0.4),
-
-            # Полносвязные слои
-            layers.Flatten(),
-            layers.Dense(512, activation='relu', kernel_regularizer=regularizers.l2(0.001)),
+            layers.SeparableConv2D(512, (3, 3), padding='same', activation='swish'),
             layers.BatchNormalization(),
+            layers.GlobalAveragePooling2D(),  # Лучше чем Flatten для сохранения пространственной информации
             layers.Dropout(0.5),
 
+            # Дополнительный компактный блок feature processing
+            layers.Dense(1024, activation='swish', kernel_regularizer=regularizers.l1_l2(l1=1e-4, l2=1e-4)),
+            layers.BatchNormalization(),
+            layers.Dropout(0.4),
+
+            layers.Dense(512, activation='swish', kernel_regularizer=regularizers.l1_l2(l1=1e-4, l2=1e-4)),
+            layers.BatchNormalization(),
+
+            # Выходной слой
             layers.Dense(num_classes, activation='softmax')
         ])
 
-        # Компиляция модели с дополнительными метриками
+        # Оптимизатор с адаптивным learning rate
+        optimizer = keras.optimizers.Adam(
+           learning_rate=keras.optimizers.schedules.CosineDecay(
+            initial_learning_rate=3e-4,
+            decay_steps=10000
+        )
+    )
+
+        # Компиляция с дополнительными метриками
         model.compile(
-            optimizer=keras.optimizers.Adam(learning_rate=0.0001),
+            optimizer=optimizer,
             loss='categorical_crossentropy',
             metrics=[
                 'accuracy',
